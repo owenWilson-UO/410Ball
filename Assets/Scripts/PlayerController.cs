@@ -1,11 +1,14 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
+
 
 public class PlayerController : MonoBehaviour
 {
     public static int MAX_JUMPS = 2;
 
     private Rigidbody rb;
+    private int count;
     private float moveX;
     private float moveZ;
     
@@ -13,6 +16,9 @@ public class PlayerController : MonoBehaviour
     private float moveY;
 
     public float moveSpeed = 0;
+    public TextMeshProUGUI countText;
+    public GameObject winTextObject;
+
 
     //private bool isGrounded = true;
 
@@ -23,6 +29,9 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        count = 0;
+        SetCountText();
+        winTextObject.SetActive(false);
     }
 
     void OnMove(InputValue mv)
@@ -31,6 +40,15 @@ public class PlayerController : MonoBehaviour
 
         moveX = moveVec.x;
         moveZ = moveVec.y;
+    }
+
+    void SetCountText()
+    {
+        countText.text = "Count: " + count.ToString();
+        if (count >= 12)
+        {
+            winTextObject.SetActive(true);        
+        }
     }
 
     void OnJump(InputValue val)
@@ -50,6 +68,16 @@ public class PlayerController : MonoBehaviour
         {
             rb.AddForce(new Vector3(0.0f, moveY, 0.0f) * moveSpeed);
             moveY -= moveY / 3f;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("PickUp"))
+        {
+            other.gameObject.SetActive(false);
+            count = count + 1;
+            SetCountText();
         }
     }
 
